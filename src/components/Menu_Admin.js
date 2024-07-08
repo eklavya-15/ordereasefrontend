@@ -22,7 +22,7 @@ const MenuAdmin = () => {
 
   useEffect(() => {
     // Fetch categories and offers from db.json using axios
-    axios.get('https://ordereasebackend.vercel.app/menu/categories')
+    axios.get('http://localhost:5000/menu/categories')
       .then(response => {
         const categories = response.data;
         setCategories(categories);
@@ -33,13 +33,13 @@ const MenuAdmin = () => {
       .catch(error => console.error('Error fetching categories:', error));
   }, []);
 
-  const handleDelete = (id) => {
-    // Update filteredDishes to remove the deleted dish
-    const newFilteredDishes = filteredDishes.filter(dish => dish.id !== id);
-    setFilteredDishes(newFilteredDishes);
+  // const handleDelete = (id) => {
+  //   // Update filteredDishes to remove the deleted dish
+  //   const newFilteredDishes = filteredDishes.filter(dish => dish.id !== id);
+  //   setFilteredDishes(newFilteredDishes);
 
-    // You can optionally delete the dish from the backend here
-  };
+  //   // You can optionally delete the dish from the backend here
+  // };
 
   const handleSearchChange = (event) => {
     const query = event.target.value;
@@ -81,7 +81,7 @@ const MenuAdmin = () => {
     setFilteredDishes([...filteredDishes, dishToAdd]);
 
     // Optionally, send the new dish to the backend
-    axios.post('https://ordereasebackend.vercel.app/menu/add-dish', dishToAdd)
+    axios.post('http://localhost:5000/menu/add-dish', dishToAdd)
       .then(response => {
         console.log('Dish added successfully:', response.data);
       })
@@ -91,6 +91,16 @@ const MenuAdmin = () => {
     setNewDish({ name: '', price: '', image: '', description: '', nutrients: '', categoryId: '' });
     setShowAddDishForm(false);
   };
+
+  const handledelete=(dishId)=>{
+    axios.delete(`http://localhost:5000/menu/categories/delete/${dishId}`)
+    .then(response => {
+    console.log(response);
+    const newFilteredDishes = filteredDishes.filter(dish => dish.id !== dishId);
+    setFilteredDishes(newFilteredDishes);
+  })
+  .catch(error => console.error('Error fetching categories:', error));
+  }
 
   return (
     <div>
@@ -250,7 +260,9 @@ const MenuAdmin = () => {
                       description={dish.description}
                       nutrients={dish.nutrients}
                       admin={true}
-                      delete={() => handleDelete(dish.id)}
+                      // delete={() => handleDelete(dish.id)}
+                      handleDelete={handledelete}
+
                     />
                     {index !== filteredDishes.length - 1 && <hr className="my-4 border-gray-300" />}
                   </div>

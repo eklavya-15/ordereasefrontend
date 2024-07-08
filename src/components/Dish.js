@@ -18,7 +18,6 @@ import { setUser, setError } from '../store/userslice';
 
 
 const DishCard = (props) => {
-
   // const {cart} = useSelector((state) => state);
   const location = useLocation();
   const userId = useSelector(selectUserId);
@@ -106,10 +105,17 @@ const DishCard = (props) => {
       console.error('Failed to remove item from cart:', error);
     }
   };
-  const handledelete=(e)=>{
-    e.preventDefault();
-    props.delete(props.id);
-  }
+  // const handledelete=(e)=>{
+  //   axios.get('http://localhost:5000/menu/categories')
+  //   .then(response => {
+  //   const categories = response.data;
+  //   setCategories(categories);
+  // })
+  // .catch(error => console.error('Error fetching categories:', error));
+  // }
+  
+
+
 
   return (
 <div className="bg-gray-100 p-4 shadow-md rounded-lg mb-4 max-w-4xl mx-auto">
@@ -152,6 +158,15 @@ const DishCard = (props) => {
         </div>
       )}
       </div>}
+
+      {props.admin && <div className="flex items-center justify-end">
+        <button
+          className="text-red-600 focus:outline-none bg-white-700 hover:bg-gray-300 px-4 py-2 rounded-lg flex items-center font-bold"
+          onClick={() => props.handleDelete(props.id)}
+        >
+          DELETE
+        </button>
+    </div>}
     </div>
   );
 };
