@@ -22,7 +22,7 @@ const MenuAdmin = () => {
 
   useEffect(() => {
     // Fetch categories and offers from db.json using axios
-    axios.get('http://localhost:5000/menu/categories')
+    axios.get('https://ordereasebackend.vercel.app/menu/categories')
       .then(response => {
         const categories = response.data;
         setCategories(categories);
@@ -81,7 +81,7 @@ const MenuAdmin = () => {
     setFilteredDishes([...filteredDishes, dishToAdd]);
 
     // Optionally, send the new dish to the backend
-    axios.post('http://localhost:5000/menu/add-dish', dishToAdd)
+    axios.post('https://ordereasebackend.vercel.app/menu/add-dish', dishToAdd)
       .then(response => {
         console.log('Dish added successfully:', response.data);
       })
@@ -93,7 +93,7 @@ const MenuAdmin = () => {
   };
 
   const handledelete=(dishId)=>{
-    axios.delete(`http://localhost:5000/menu/categories/delete/${dishId}`)
+    axios.delete(`https://ordereasebackend.vercel.app/menu/categories/delete/${dishId}`)
     .then(response => {
     console.log(response);
     const newFilteredDishes = filteredDishes.filter(dish => dish.id !== dishId);

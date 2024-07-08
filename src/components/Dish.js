@@ -106,7 +106,7 @@ const DishCard = (props) => {
     }
   };
   // const handledelete=(e)=>{
-  //   axios.get('http://localhost:5000/menu/categories')
+  //   axios.get('https://ordereasebackend.vercel.app/menu/categories')
   //   .then(response => {
   //   const categories = response.data;
   //   setCategories(categories);
