@@ -78,6 +78,7 @@ const Profile = () => {
                 value={formData.name}
                 placeholder={userInfo && userInfo.name}
                 onChange={handleChange}
+                required
                 className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
@@ -92,6 +93,7 @@ const Profile = () => {
                 value={formData.email}
                 placeholder={userInfo && userInfo.email}
                 onChange={handleChange}
+                required
                 className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
@@ -106,6 +108,7 @@ const Profile = () => {
                 value={formData.number}
                 placeholder={userInfo && userInfo.number}
                 onChange={handleChange}
+                required
                 className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
