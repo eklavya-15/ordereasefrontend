@@ -29,11 +29,26 @@ const CartSlice = createSlice({
           itemToUpdate.amount--;
         }
       },
+      clearCart(state)
+        {
+            // state = [];
+            state.items.splice(0, state.length);
+            // console.log(state);
+        },
+
+        repeatOrder(state, action)
+        {
+            action.payload.forEach(item => {
+                state.push({food: item.food, amount: item.amount});
+            })
+
+            // state = action.payload;
+        }
     },
   });
   
 
-export const {addToCart, removeFromCart, increment, decrement,setCart} = CartSlice.actions;
+export const {addToCart, removeFromCart, increment, decrement,setCart,clearCart,repeatOrder} = CartSlice.actions;
 
 export const selectCart = (state) => state.cart;
 

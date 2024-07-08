@@ -1,14 +1,20 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, {useState} from 'react';
+import { useSelector,useDispatch } from 'react-redux';
 import Navbar from './Navbar';
-import PaymentComponent from './PaymentComponent';
 import { selectUserInfo,selectUserId } from '../store/userslice.js';
+import {useNavigate } from 'react-router-dom';
+import { addToHistory } from '../store/OrderHistory';
+import {clearCart} from "../store/CartSlice";
+import { toast } from 'react-toastify';
+import { clearCart as clearCartAPI } from '../store/cartAPI.js';
+import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import axios from 'axios';
 
 
 const CheckoutPage = () => {
   const { cart } = useSelector((state) => state);
-  const TAX_RATE = 0.1; // Example tax rate
-  const DISCOUNT = 0.05; // Example discount rate for demonstration
+  const TAX_RATE = 0.1; 
+  const DISCOUNT = 0.05;
   const userId = useSelector(selectUserId);
   const userInfo = useSelector(selectUserInfo);
 
@@ -24,7 +30,70 @@ const CheckoutPage = () => {
   const tax = subtotal * TAX_RATE;
   const discount = subtotal * DISCOUNT;
   const total = subtotal + tax - discount;
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const stripe = useStripe();
+  const elements = useElements();
+  const [paymentError, setPaymentError] = useState(null);
+  const [processing, setProcessing] = useState(false);
 
+  
+
+    const handlePaymentSubmit = async (event) => {
+      event.preventDefault();
+      if (!stripe || !elements) {
+  
+        return;
+      }
+  
+      try {
+        setProcessing(true);
+        const paymentIntentResponse = await axios.post('https://ordereasebackend.vercel.app/api/payment/create-payment-intent', {
+          amount: Math.round(total),
+          currency: 'usd', 
+          userId: userInfo._id,
+          userEmail: userInfo.email,
+          food: cart.items.map(item => item.dish.name).join(', '),
+          items: cart.items,
+          name: userInfo.name,
+          total: total,
+          orderType: userInfo.selectedOption,
+          tableNo: userInfo.tableNo,
+          selectedAddress: userInfo.selectedAddress,
+          orderStatus: ''
+        }); 
+  
+        const clientSecret = paymentIntentResponse.data.clientSecret;
+  
+        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: elements.getElement(CardElement),
+            billing_details: {
+              name: userInfo.name, // Replace with actual userInfo name
+            },
+          },
+        });
+        
+        if (error) {
+          setPaymentError(error.message);
+          console.error('Payment failed:', error);
+          setProcessing(false);
+        } else {
+          if (paymentIntent.status === 'succeeded') {
+            const cart = await clearCartAPI(userId);
+            dispatch(clearCart());
+            var d = new Date();
+            dispatch(addToHistory({cartItems: cart, totalPrice: total, currDate: d}));
+           toast.success('Order Placed!');
+           navigate("/feedback");
+          }
+        }
+      } catch (error) {
+        setPaymentError('Payment failed. Please try again.');
+        console.error('Error:', error);
+        setProcessing(false);
+      }
+    };
   return (
     <div>
       <Navbar />
@@ -60,8 +129,45 @@ const CheckoutPage = () => {
                 <p className="text-xl font-semibold text-gray-800">{total.toFixed(2)} Rs</p>
               </div>
             </div>
+             {/* Payment form */}
+             <form onSubmit={handlePaymentSubmit}>
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Payment Method</h3>
+                <div className="mb-4">
+                  <CardElement
+                    options={{
+                      style: {
+                        base: {
+                          fontSize: '16px',
+                          color: '#424770',
+                          '::placeholder': {
+                            color: '#aab7c4',
+                          },
+                        },
+                        invalid: {
+                          color: '#9e2146',
+                        },
+                      },
+                    }}
+                  />
+                </div>
+              </div>
 
-            <div className="mb-6">
+              {/* Display payment error */}
+              {paymentError && <div className="text-red-500">{paymentError}</div>}
+
+              {/* Submit button */}
+              <div className="flex justify-center">
+                <button
+                  type="submit"
+                  disabled={!stripe || processing}
+                  className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300"
+                >
+                  {processing ? 'Processing...' : 'Confirm and Pay'}
+                </button>
+              </div>
+            </form>
+            {/* <div className="mb-6">
               <h3 className="text-xl font-semibold text-gray-800 mb-4">Payment Method</h3>
               <div className="mb-4">
                 <select
@@ -74,9 +180,9 @@ const CheckoutPage = () => {
                   <option value="upi">UPI</option>
                 </select>
               </div>
-            </div>
+            </div> */}
 
-            <div className="mb-6">
+            {/* <div className="mb-6">
               <h3 className="text-xl font-semibold text-gray-800 mb-4">Discount Code</h3>
               <div className="flex">
                 <input
@@ -89,16 +195,14 @@ const CheckoutPage = () => {
                   Apply
                 </button>
               </div>
-            </div>
+            </div> */}
 
-            <div className="flex justify-center">
-            <PaymentComponent
-                userId={userId}
-                userEmail={userInfo?.email}
-                amount={total * 100} 
-                food={cart.items.map(item => item.dish.name).join(', ')}
-              />
-            </div>
+            {/* <div className="flex justify-center">
+              <button onClick={handleCheckout} className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300">
+                Confirm and Pay
+              </button>
+             
+            </div> */}
           </div>
         </div>
       </div>

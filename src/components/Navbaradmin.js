@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FaBars, FaTimes } from 'react-icons/fa';
 
-const Navbar = () => {
+const NavbarAdmin = () => {
   const [isOpen, setIsOpen] = useState(false);
   const timeoutRef = useRef(null);
 
@@ -26,7 +26,7 @@ const Navbar = () => {
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <Link
-            to="/menu"
+            to="/admin"
             className="flex items-center space-x-4 text-gray-800 hover:text-blue-500 transition duration-300"
           >
             <img src="/logo.jpg" alt="OrderEase Logo" className="h-8 w-auto" />
@@ -35,16 +35,10 @@ const Navbar = () => {
         </div>
         <div className="hidden md:flex space-x-8">
           <Link
-            to="/menu"
+            to="/menu_admin"
             className="text-gray-800 text-lg hover:text-blue-500 transition duration-300"
           >
-            Menu
-          </Link>
-          <Link
-            to="/cart"
-            className="text-gray-800 text-lg hover:text-blue-500 transition duration-300"
-          >
-            Cart
+            Your Menu
           </Link>
           <div
             className="relative group"
@@ -58,19 +52,19 @@ const Navbar = () => {
               className={`absolute ${isOpen ? 'block' : 'hidden'} bg-white shadow-lg rounded mt-2 w-40`}
             >
               <Link
-                to="/profile"
-                className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-              >
-                Profile
-              </Link>
-              <Link
-                to="/orders"
+                to="/admin"
                 className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
               >
                 Orders
               </Link>
+              <Link
+                to="/Reviews"
+                className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+              >
+                Customer Feedback
+              </Link>
               {/* <Link
-                to="/settings"
+                to="/settings_admin"
                 className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
               >
                 Settings
@@ -86,19 +80,16 @@ const Navbar = () => {
       </div>
       {isOpen && (
         <div className="md:hidden">
-          <Link to="/menu" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-            Menu
+          <Link to="/menu_admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+            Your Menu
           </Link>
-          <Link to="/cart" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-            Cart
-          </Link>
-          <Link to="/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-            Profile
-          </Link>
-          <Link to="/orders" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+          <Link to="/admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
             Orders
           </Link>
-          {/* <Link to="/settings" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+          <Link to="/Reviews" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+            Customer Feedback
+          </Link>
+          {/* <Link to="/settings_admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
             Settings
           </Link> */}
         </div>
@@ -107,4 +98,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default NavbarAdmin;

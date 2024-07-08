@@ -1,48 +1,44 @@
-import React, { useState ,useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from "./Navbar";
 import { useDispatch, useSelector } from 'react-redux';
-import {removeFromCart, increment, decrement} from "../store/CartSlice";
-import {setCart} from "../store/CartSlice";
-import { selectUserInfo,selectUserId } from '../store/userslice.js';
+import { removeFromCart, increment, decrement, setCart } from "../store/CartSlice";
+import { selectUserInfo, selectUserId, setUser, setError } from '../store/userslice';
 import {
   getCart,
   incrementItem as incrementItemAPI,
   decrementItem as decrementItemAPI,
   removeFromCart as removeFromCartAPI
-} from '../store/cartAPI.js';
-import { getUserById } from "../store/userAPI";
-import { setUser, setError } from '../store/userslice';
+} from '../store/cartAPI';
+import { getUserById,updateUser } from "../store/userAPI";
 
 const CartPage = () => {
   const userInfo = useSelector(selectUserInfo);
-  console.log(userInfo);
-  const [addresses, setAddresses] = useState([
-    { id: 1, houseNumber: '123', area: 'Sector 15', city: 'Panchkula' },
-    { id: 2, houseNumber: '456', area: 'Sector 13', city: 'Bhiwani' },
-    { id: 3, houseNumber: '789', area: 'Defense Colony', city: 'Hisar' },
-  ]);
-
-  const [selectedOption, setSelectedOption] = useState('Home Delivery');
-  const [quantity, setQuantity] = useState(false);
   const dispatch = useDispatch();
-  const {cart} = useSelector((state)=>state);
+  const { cart } = useSelector((state) => state);
   const userId = useSelector(selectUserId);
-  // console.log(userId);
-  // console.log(cart);
 
+  const [selectedAddress, setSelectedAddress] = useState('');
+  const [selectedOption, setSelectedOption] = useState('Home Delivery');
+  const [table, setTable] = useState("Select Table Number");
+  const [quantity, setQuantity] = useState(false);
+  const [showAddAddressPopup, setShowAddAddressPopup] = useState(false);
+  const [newAddress, setNewAddress] = useState({ houseNumber: '', area: '', city: '' });
+  
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem('token');
         const userInfo = await getUserById(token);
-        dispatch(setUser({ userId: userInfo._id, userInfo: userInfo}));
+        dispatch(setUser({ userId: userInfo._id, userInfo: userInfo }));
+        localStorage.setItem('userInfo', JSON.stringify(userInfo)); // Save userInfo to local storage
       } catch (error) {
         dispatch(setError(error.message));
       }
     };
     fetchUser();
-  }, [dispatch,cart]);
+  }, [dispatch]);
+
   useEffect(() => {
     const fetchCart = async () => {
       try {
@@ -63,66 +59,115 @@ const CartPage = () => {
     fetchCart();
   }, [dispatch, quantity]);
 
-
-  const [showAddAddressPopup, setShowAddAddressPopup] = useState(false);
-  const [newAddress, setNewAddress] = useState({ houseNumber: '', area: '', city: '' });
-
-  const[table, setTable] = useState("Select Table Number")
-
   const totalPrice = () => {
-    let sm = 0;
-    cart.items.forEach((temp) => {
-      sm += (temp.amount)*(temp.dish.price);
-    });
-    return sm;
+    return cart.items.reduce((total, item) => total + item.amount * item.dish.price, 0);
   };
 
-  async function handleIncrement(item) {
+  const handleIncrement = async (item) => {
     try {
-      await incrementItemAPI(userId,item.name);
+      await incrementItemAPI(userId, item.name);
       dispatch(increment({ dish: item }));
       setQuantity((prev) => !prev);
     } catch (error) {
       console.error('Failed to add item to cart:', error);
     }
-  }
-  
+  };
 
-  async function handleDecrement(item, amt) {
-    // console.log(item,amt);
+  const handleDecrement = async (item, amt) => {
     try {
       if (amt !== 1) {
-        await decrementItemAPI(userId,item.name);
+        await decrementItemAPI(userId, item.name);
         dispatch(decrement({ dish: item }));
         setQuantity((prev) => !prev);
       } else {
-        await removeFromCartAPI(userId,item.name);
+        await removeFromCartAPI(userId, item.name);
         dispatch(removeFromCart({ dish: item }));
         setQuantity((prev) => !prev);
       }
     } catch (error) {
       console.error('Failed to remove item from cart:', error);
     }
-  }
-
-  const handleDeleteAddress = (id) => {
-    setAddresses(addresses.filter((addr) => addr.id !== id));
   };
 
-  const handleAddAddress = () => {
-    if (newAddress.houseNumber && newAddress.area && newAddress.city) {
-      const newId = addresses.length > 0 ? addresses[addresses.length - 1].id + 1 : 1;
-      setAddresses([...addresses, { id: newId, ...newAddress }]);
-      setNewAddress({ houseNumber: '', area: '', city: '' });
-      setShowAddAddressPopup(false); 
+  const handleDeleteAddress = async (fulladdress) => {
+    const newUserAddress = userInfo.address.filter((addr) => addr !== fulladdress);
+    console.log(newUserAddress);
+    try {
+      const updatedUser = await updateUser(userId, { address: [...newUserAddress] });
+      console.log("Updated user info:", updatedUser);
+      dispatch(setUser({ userId: updatedUser._id, userInfo: updatedUser }));
+      alert("Address Deleted!");
+    } catch (error) {
+      console.error("Error updating user:", error);
+      dispatch(setError(error.message));
     }
   };
 
-  function handleTableChange(event){
-    let temp1 = event.target.value;
-    setTable(temp1);
-  }
+  // const handleAddAddress = async (e) => {
+  //   e.preventDefault();
+  //   console.log("atlease i was called",newAddress);
+  //     const address = `${newAddress.houseNumber}, ${newAddress.area}, ${newAddress.city}`;
+  //     console.log(address);
+  //     try {
+  //       const userInfo = await updateUser(userId, {"address": [...userInfo.address, address]});
+  //       dispatch(setUser({ userId: userInfo._id, userInfo: userInfo }));
+  //       alert("Address Added!");
+  //       setNewAddress({ houseNumber: '', area: '', city: '' });
+  //       setShowAddAddressPopup(false);
+  //     } catch (error) {
+  //       dispatch(setError(error.message));
+  //     }
+  // };
 
+  const handleAddAddress = async (e) => {
+    e.preventDefault();
+    const address = `${newAddress.houseNumber}, ${newAddress.area}, ${newAddress.city}`;
+    try {
+      const updatedUser = await updateUser(userId, { address: [...userInfo.address, address] });
+      console.log("Updated user info:", updatedUser);
+      dispatch(setUser({ userId: updatedUser._id, userInfo: updatedUser }));
+      alert("Address Added!");
+      setNewAddress({ houseNumber: '', area: '', city: '' });
+      setShowAddAddressPopup(false);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      dispatch(setError(error.message));
+    }
+  };
+  
+  const handleTableChange = (event) => {
+    setTable(event.target.value);
+  };
+
+  const handleCheckout = async () => {
+    try {
+      if(selectedOption=== 'Home Delivery'){
+        if(selectedAddress === ''){
+          alert("Please select an address for delivery");
+        }
+        else{
+          const updatedUser = await updateUser(userId, { selectedOption:'Home Delivery',selectedAddress:selectedAddress });
+          console.log("Updated user info:", updatedUser);
+          dispatch(setUser({ userId: updatedUser._id, userInfo: updatedUser }));
+          setSelectedAddress('');
+
+        }
+      }
+      else if(selectedOption === 'Dine-in'){
+        if(table === 'Select Table Number'){
+          alert("Please select a table number for dine-in");
+        }
+        else{
+          const updatedUser = await updateUser(userId, { selectedOption:'Dine-in',tableNo:table });
+          console.log("Updated user info:", updatedUser);
+          dispatch(setUser({ userId: updatedUser._id, userInfo: updatedUser }));
+          setTable('Select Table Number');
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <div>
       <Navbar />
@@ -133,12 +178,12 @@ const CartPage = () => {
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Your Details</h2>
               <div className="flex items-center space-x-4 mb-4">
                 <div className="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden">
-                  <img src="" alt="Profile" className="object-cover w-full h-full" />
+                  <img src="https://cdn-icons-png.flaticon.com/512/4715/4715330.png" alt="Profile" className="object-cover w-full h-full" />
                 </div>
                 <div>
-                  <p className="text-lg font-semibold text-gray-800">{userInfo.name}</p>
-                  <p className="text-gray-600">{userInfo.email}</p>
-                  <p className="text-gray-600">{userInfo.number}</p>
+                  <p className="text-lg font-semibold text-gray-800">{userInfo && userInfo.name}</p>
+                  <p className="text-gray-600">{userInfo && userInfo.email}</p>
+                  <p className="text-gray-600">{userInfo && userInfo.number}</p>
                 </div>
               </div>
             </div>
@@ -168,17 +213,19 @@ const CartPage = () => {
               {selectedOption === 'Home Delivery' && (
                 <div>
                   <h2 className="text-xl font-semibold text-gray-800 mb-4">Delivery Address</h2>
-                  {addresses.map((addr) => (
-                    <div key={addr.id} className="flex items-center justify-between mb-4">
-                      <p className="text-gray-800">{addr.houseNumber}, {addr.area}, {addr.city}</p>
+                  {userInfo && userInfo.address.map((addr,index) => (
+                    <div key={index} className="flex items-center justify-between mb-4">
+                      <p className="text-gray-800">{addr}</p>
                       <div className="flex space-x-2">
                         <button
-                          className="bg-white text-red-700 px-3 py-1 rounded-lg border border-red-700 font-semibold hover:bg-red-700 hover:text-white transition duration-300"
-                          onClick={() => handleDeleteAddress(addr.id)}
+                          className={`text-red-700 px-3 py-1 rounded-lg border border-red-700 font-semibold hover:bg-red-700 hover:text-white transition duration-300`}
+                          onClick={() => handleDeleteAddress(addr)}
                         >
                           Delete
                         </button>
-                        <button className="bg-white text-green-700 px-3 py-1 rounded-lg border border-green-700 font-semibold hover:bg-green-700 hover:text-white transition duration-300">
+                        <button 
+                        onClick={() => setSelectedAddress(addr)}
+                        className={`${selectedAddress === addr ? 'bg-green-700 text-white' : 'bg-white text-green-700'} px-3 py-1 rounded-lg border border-green-700 font-semibold hover:bg-green-700 hover:text-white transition duration-300`}>
                           Select
                         </button>
                       </div>
@@ -228,6 +275,7 @@ const CartPage = () => {
                         </div>
                         <div className="flex justify-center">
                           <button
+                           type='submit'
                             onClick={handleAddAddress}
                             className="bg-green-700 text-white px-6 py-2 rounded-lg hover:bg-green-800 transition duration-300"
                           >
@@ -256,22 +304,22 @@ const CartPage = () => {
 
               {selectedOption === 'Dine-in' && (
                 <div>
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">Dine-in</h2>
-                {/* Dine-in option: Add table number dropdown */}
-                <div className="mb-4">
-                  <select
-                    id="tableNumber"
-                    className="w-1/3 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-700"
-                    onChange={handleTableChange}
-                    value={table}
-                  >
-                    <option key='0' value='0'>Select Table Number</option>
-                     {Array.from({ length: 15 }, (_, i) => (
-                      <option key={i+1} value={i+1}>Table {i+1}</option>
-                    ))} 
-                  </select>
+                  <h2 className="text-xl font-semibold text-gray-800 mb-4">Dine-in</h2>
+                  {/* Dine-in option: Add table number dropdown */}
+                  <div className="mb-4">
+                    <select
+                      id="tableNumber"
+                      className="w-1/3 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-700"
+                      onChange={handleTableChange}
+                      value={table}
+                    >
+                      <option key='0' value='0'>Select Table Number</option>
+                      {Array.from({ length: 15 }, (_, i) => (
+                        <option key={i+1} value={i+1}>Table {i+1}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-              </div>
               )}
             </div>
           </div>
@@ -311,7 +359,7 @@ const CartPage = () => {
                     <label htmlFor="total" className="ml-4 block text-sm font-medium text-gray-700">Total:</label>
                     <p id="total" className="ml-4 text-xl font-semibold text-gray-800">{totalPrice()} Rs</p>
                   </div>
-                  <Link to="/checkout" className="mr-4 bg-green-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300">Checkout</Link>
+                  {(selectedAddress !== '' || table !== 'Select Table Number') && <Link to="/checkout" onClick={handleCheckout} className="mr-4 bg-green-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300">Checkout</Link>}
                 </div>
               </div>
             </div>
@@ -330,7 +378,7 @@ const CartPage = () => {
                     Start Ordering
                   </button>
                 </Link>
-              </div> 
+              </div>
             </div>
           )}
         </div>

@@ -32,7 +32,6 @@ const Menu = () => {
         const offers = response.data;
         const offerTitles = offers.map(offer => offer.title);
         setOffers(offerTitles);
-        console.log(offers);
       })
       .catch(error => console.error('Error fetching offers:', error));
   }, []);
@@ -45,7 +44,7 @@ const Menu = () => {
   };
 
   const handleCategoryChange = (event) => {
-    const categoryId = parseInt(event.target.value);
+    const categoryId = (event.target.value);
     setSelectedCategory(categoryId);
 
     filterDishes(categoryId, searchQuery);
@@ -55,7 +54,7 @@ const Menu = () => {
     let allDishes = categories.flatMap(category => category.dishes);
 
     if (categoryId) {
-      const category = categories.find(cat => cat.id === categoryId);
+      const category = categories.find(cat => cat.name === categoryId);
       allDishes = category ? category.dishes : [];
     }
 
@@ -71,7 +70,7 @@ const Menu = () => {
       <Navbar />
     <div className="categories bg-gray-100 min-h-screen py-8">
       <div className="max-w-3xl mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-4 text-center">Menu</h2>
+        <h2 className="text-3xl font-bold mb-4 text-center text-black">Menu</h2>
 
         {/* Search and Category selection */}
         <div className="flex items-center justify-between mb-4">
@@ -122,6 +121,8 @@ const Menu = () => {
                     item={dish}
                     description={dish.description}
                     nutrients={dish.nutrients}
+                    admin={false}
+                    reload={true}
                   />
                   {index !== filteredDishes.length - 1 && <hr className="my-4 border-gray-300" />} {/* Horizontal gray line */}
                 </div>

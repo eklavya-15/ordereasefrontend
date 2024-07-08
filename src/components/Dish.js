@@ -3,6 +3,7 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { green} from '@mui/material/colors';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import {
   getCart,
   addToCart as addToCartAPI,
@@ -19,10 +20,9 @@ import { setUser, setError } from '../store/userslice';
 const DishCard = (props) => {
 
   // const {cart} = useSelector((state) => state);
+  const location = useLocation();
   const userId = useSelector(selectUserId);
   const cart = useSelector(selectCart);
-  // console.log(userId);
-  //console.log(JSON.stringify(cart, null, 2));
   const dispatch = useDispatch();
   const[present, setPresent] = useState(!cart.items.length || !(cart.items.some((product) => product.dish.id === props.id)) ? true : false);
   const getQuantity = () => {
@@ -34,8 +34,7 @@ const DishCard = (props) => {
       else return 0;
   }
   const[quantity, setQuantity] = useState(getQuantity);
-  // const [quantity, setQuantity] = useState(0);
-  // const [present, setPresent] = useState(true);
+  
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -73,7 +72,7 @@ const DishCard = (props) => {
     };
 
     fetchCart();
-  }, [dispatch]);
+  }, [dispatch, userId, location.pathname,cart.items.length]);
 
   const handleAddItem = async () => {
     try {
@@ -107,11 +106,14 @@ const DishCard = (props) => {
       console.error('Failed to remove item from cart:', error);
     }
   };
-  
+  const handledelete=(e)=>{
+    e.preventDefault();
+    props.delete(props.id);
+  }
 
   return (
-    <div className="bg-white p-4 shadow-md rounded-lg mb-4 max-w-4xl mx-auto">
-      <div className="flex items-center mb-4">
+<div className="bg-gray-100 p-4 shadow-md rounded-lg mb-4 max-w-4xl mx-auto">
+        <div className="flex items-center mb-4">
         <div className="w-24 h-24 mr-4">
           <img src={props.image} alt={props.name} className="w-full h-full object-cover rounded-lg" />
         </div>
@@ -123,7 +125,7 @@ const DishCard = (props) => {
         </div>
       </div>
       
-      <div className="flex items-center justify-end">
+      {!props.admin && <div className="flex items-center justify-end">
         {quantity === 0 ? (
         <button
           className="text-gray-600 focus:outline-none bg-white-700 hover:bg-gray-300 px-4 py-2 rounded-lg flex items-center font-bold"
@@ -149,7 +151,7 @@ const DishCard = (props) => {
           </button>
         </div>
       )}
-      </div>
+      </div>}
     </div>
   );
 };

@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-// import { loginUser, fetchLoggedInUserInfo, updateUser } from '../api/userApi';
 
 const initialState = {
   userInfo: null,

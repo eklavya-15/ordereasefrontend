@@ -41,7 +41,11 @@ const AuthForm = () => {
       if (token) {
         localStorage.setItem('token', token);
         dispatch(setUser({ userId: token, userInfo: { email: credentials.email, role: role,name:credentials.name,number:credentials.number, address:credentials.address } }));
-        navigate("/menu");
+        if(role==='customer'){
+          navigate("/menu");}
+          else{
+            navigate("/admin");
+          }
       } else {
         setError('Authentication failed. Please check your credentials.');
       }

@@ -26,3 +26,13 @@ export const decrementItem = async (userId,name) => {
   return response.data;
 };
 
+export const clearCart = async (userId) => {
+  const patchData = "Nothing to add, just to clear the cart"; 
+  try {
+    const response = await axios.patch(`https://ordereasebackend.vercel.app/cart/${userId}`, patchData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Error updating user data');
+  }
+};
+
