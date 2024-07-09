@@ -4,7 +4,7 @@ import Navbar from './Navbar';
 import { selectUserInfo,selectUserId } from '../store/userslice.js';
 import {useNavigate } from 'react-router-dom';
 import { addToHistory } from '../store/OrderHistory';
-import {clearCart} from "../store/CartSlice";
+import {clearCart, setCart} from "../store/CartSlice";
 import { toast } from 'react-toastify';
 import { clearCart as clearCartAPI } from '../store/cartAPI.js';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
@@ -51,7 +51,7 @@ const CheckoutPage = () => {
         const paymentIntentResponse = await axios.post('https://ordereasebackend.vercel.app/api/payment/create-payment-intent', {
           amount: Math.round(total),
           currency: 'usd', 
-          userId: userInfo._id,
+          userId: userId,
           userEmail: userInfo.email,
           food: cart.items.map(item => item.dish.name).join(', '),
           items: cart.items,
@@ -81,11 +81,11 @@ const CheckoutPage = () => {
         } else {
           if (paymentIntent.status === 'succeeded') {
             const cart = await clearCartAPI(userId);
-            dispatch(clearCart());
-            var d = new Date();
-            dispatch(addToHistory({cartItems: cart, totalPrice: total, currDate: d}));
-           toast.success('Order Placed!');
-           navigate("/feedback");
+            // dispatch(clearCart());
+            dispatch(setCart([]));
+            console.log(cart);
+            toast.success('Order Placed!');
+            navigate("/feedback");
           }
         }
       } catch (error) {
@@ -107,26 +107,26 @@ const CheckoutPage = () => {
               {cart.items.map((item) => (
                 <div key={item.dish.id} className="flex justify-between items-center mb-2">
                   <p className="text-gray-800">{item.dish.name} x {item.amount}</p>
-                  <p className="text-gray-800">{item.amount * item.dish.price} Rs</p>
+                  <p className="text-gray-800">₹{item.amount * item.dish.price}</p>
                 </div>
               ))}
               <hr className="my-4" />
               <div className="flex justify-between items-center mb-2">
                 <p className="text-gray-800 font-semibold">Subtotal</p>
-                <p className="text-gray-800 font-semibold">{subtotal.toFixed(2)} Rs</p>
+                <p className="text-gray-800 font-semibold">₹{subtotal.toFixed(2)}</p>
               </div>
               <div className="flex justify-between items-center mb-2">
                 <p className="text-gray-800">Tax (10%)</p>
-                <p className="text-gray-800">{tax.toFixed(2)} Rs</p>
+                <p className="text-gray-800">₹{tax.toFixed(2)}</p>
               </div>
               <div className="flex justify-between items-center mb-2">
                 <p className="text-gray-800">Discount</p>
-                <p className="text-gray-800">- {discount.toFixed(2)} Rs</p>
+                <p className="text-gray-800">- ₹{discount.toFixed(2)}</p>
               </div>
               <hr className="my-4" />
               <div className="flex justify-between items-center">
                 <p className="text-xl font-semibold text-gray-800">Total</p>
-                <p className="text-xl font-semibold text-gray-800">{total.toFixed(2)} Rs</p>
+                <p className="text-xl font-semibold text-gray-800">₹{total.toFixed(2)}</p>
               </div>
             </div>
              {/* Payment form */}

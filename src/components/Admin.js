@@ -12,7 +12,6 @@ const Admin = () => {
   const userId = useSelector(selectUserId);
   const userInfo = useSelector(selectUserInfo);
   const orders = useSelector(selectAllOrders);
-  console.log(orders);
   useEffect(() => {
     const fetchOrdersFromAPI = async () => {
       const data = await getAllOrders();
@@ -51,7 +50,7 @@ const Admin = () => {
                 <tbody className="divide-y divide-gray-200">
                   {orders.map(order => (
                     <tr key={order.id}> 
-                      <td className="px-4 py-2 whitespace-nowrap">{order._id}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">#{order._id}</td>
                       <td className="px-4 py-2 whitespace-nowrap">{order.orderType || 'Dine'}</td>
                       <td className="px-4 py-2 whitespace-nowrap">{(order.orderType == 'Dine-in') ? order.tableNo : '-' }</td>
                       <td className="px-4 py-2 whitespace-nowrap">{order.name || order.userEmail}</td>
@@ -60,8 +59,8 @@ const Admin = () => {
                           <div key={item._id}>{item.dish.name} x {item.amount || 1}</div>
                         ))}
                       </td>
-                      <td className="px-4 py-2 whitespace-nowrap">Rs {order.amount}</td>
-                      <td className="px-4 py-2 whitespace-nowrap">{(order.orderType == 'Home Delivery') ? `Delivered at ${order.selectedAddress}` : `Payment recieved Rs ${order.amount}`}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">₹{order.amount}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">{(order.orderType == 'Home Delivery') ? `Delivered at ${order.selectedAddress}` : `Payment recieved ₹${order.amount}`}</td>
                       <td className="px-4 py-2 whitespace-nowrap">
                         <select
                           value={order.orderStatus}
@@ -71,6 +70,7 @@ const Admin = () => {
                           <option value="Pending">Pending</option>
                           <option value="Preparing Order">Preparing Order</option>
                           <option value="Out for Delivery">Out for Delivery</option>
+                          <option value="Order Completed">Order Completed</option>
                         </select>
                       </td>
                     </tr>

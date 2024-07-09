@@ -196,12 +196,7 @@ const CartPage = () => {
                 >
                   Home Delivery
                 </button>
-                <button 
-                  className={`px-4 py-2 rounded-lg font-semibold ${selectedOption === 'Pick-up' ? 'bg-green-700 text-white' : 'bg-gray-200 text-gray-700'}`}
-                  onClick={() => setSelectedOption('Pick-up')}
-                >
-                  Pick-up
-                </button>
+               
                 <button 
                   className={`px-4 py-2 rounded-lg font-semibold ${selectedOption === 'Dine-in' ? 'bg-green-700 text-white' : 'bg-gray-200 text-gray-700'}`}
                   onClick={() => setSelectedOption('Dine-in')}
@@ -294,13 +289,7 @@ const CartPage = () => {
                 </div>
               )}
 
-              {selectedOption === 'Pick-up' && (
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-800 mb-4">Pick-up</h2>
-                  {/* Add pick-up options here */}
-                  <p className="text-gray-800">Select your pick-up location or time slot here.</p>
-                </div>
-              )}
+           
 
               {selectedOption === 'Dine-in' && (
                 <div>
@@ -348,7 +337,7 @@ const CartPage = () => {
                               <button className="text-lg focus:outline-none bg-white-700 hover:bg-gray-300 px-2 rounded-lg font-bold" onClick={() => handleIncrement(temp.dish)}>+</button>
                             </div>
                           </td>
-                          <td className="px-4 py-2 whitespace-nowrap">{(temp.amount) * (temp.dish.price)}</td>
+                          <td className="px-4 py-2 whitespace-nowrap">₹{(temp.amount) * (temp.dish.price)}</td>
                         </tr>
                       </tbody>
                     ))}
@@ -357,7 +346,7 @@ const CartPage = () => {
                 <div className="flex justify-between items-center mt-4">
                   <div>
                     <label htmlFor="total" className="ml-4 block text-sm font-medium text-gray-700">Total:</label>
-                    <p id="total" className="ml-4 text-xl font-semibold text-gray-800">{totalPrice()} Rs</p>
+                    <p id="total" className="ml-4 text-xl font-semibold text-gray-800">₹{totalPrice()}</p>
                   </div>
                   {(selectedAddress !== '' || table !== 'Select Table Number') && <Link to="/checkout" onClick={handleCheckout} className="mr-4 bg-green-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300">Checkout</Link>}
                 </div>

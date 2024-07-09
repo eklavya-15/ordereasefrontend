@@ -4,6 +4,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import DishCard from './Dish.js'; 
 import Offers from './offers.js';
 import Navbar from './Navbar.js';
+import { useSelector } from 'react-redux';
+import { selectCart } from '../store/CartSlice.js';
 
 const Menu = () => {
   const [categories, setCategories] = useState([]);
@@ -11,6 +13,8 @@ const Menu = () => {
   const [filteredDishes, setFilteredDishes] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [offers, setOffers] = useState([]);
+  const cart = useSelector(selectCart);
+  // console.log(cart);
 
   useEffect(() => {
     // Fetch categories and offers from db.json using axios
@@ -113,7 +117,7 @@ const Menu = () => {
             <div>
               {filteredDishes.map((dish, index) => (
                 <div key={dish.id}>
-                  <DishCard
+                  {cart && <DishCard
                     id={dish.id}
                     image={dish.image}
                     name={dish.name}
@@ -121,9 +125,10 @@ const Menu = () => {
                     item={dish}
                     description={dish.description}
                     nutrients={dish.nutrients}
+                    amount={cart.items.find(item => item.dish.id === dish.id)?.amount || 0}
                     admin={false}
                     reload={true}
-                  />
+                  />}
                   {index !== filteredDishes.length - 1 && <hr className="my-4 border-gray-300" />} {/* Horizontal gray line */}
                 </div>
               ))}

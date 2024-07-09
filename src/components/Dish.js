@@ -71,9 +71,10 @@ const DishCard = (props) => {
     };
 
     fetchCart();
-  }, [dispatch, userId, location.pathname,cart.items.length]);
+  }, [dispatch,props.amount,quantity]);
 
   const handleAddItem = async () => {
+    setQuantity((prev) => prev + 1);
     try {
       if (quantity === 0) {
         await addToCartAPI(userId,{ dish: props.item, amount: 1 });
@@ -125,14 +126,14 @@ const DishCard = (props) => {
         </div>
         <div className="flex-1">
           <h4 className="text-xl font-bold">{props.name}</h4>
-          <p className="text-black-500 mt-1 font-bold">{props.price}</p>
+          <p className="text-black-500 mt-1 font-bold">₹{props.price}</p>
           <p className="text-gray-600 mt-2">{props.description}</p>
           <p className="text-gray-500 text-sm mt-2">[{props.nutrients}]</p>
         </div>
       </div>
       
       {!props.admin && <div className="flex items-center justify-end">
-        {quantity === 0 ? (
+        {cart && (quantity === 0) ? (
         <button
           className="text-gray-600 focus:outline-none bg-white-700 hover:bg-gray-300 px-4 py-2 rounded-lg flex items-center font-bold"
           style={{ color: green[700] }}
