@@ -74,7 +74,6 @@ const DishCard = (props) => {
   }, [dispatch,props.amount,quantity]);
 
   const handleAddItem = async () => {
-    setQuantity((prev) => prev + 1);
     try {
       if (quantity === 0) {
         await addToCartAPI(userId,{ dish: props.item, amount: 1 });
