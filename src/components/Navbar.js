@@ -69,6 +69,12 @@ const Navbar = () => {
               >
                 Orders
               </Link>
+              <Link
+                to="/"
+                className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+              >
+                Log Out
+              </Link>
               {/* <Link
                 to="/settings"
                 className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
