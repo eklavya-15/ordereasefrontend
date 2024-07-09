@@ -82,7 +82,7 @@ const Orders = () => {
               <div className="flex justify-between items-center mb-2">
                 {/* <p className="text-gray-600">{order.currDate.toLocaleDateString()}</p> */}
                 <p className='px-2 py-1 rounded-lg bg-green-200 text-green-800'>
-                  Delivered
+                  Order Completed
                 </p>
               </div>
               <div className="space-y-2">
