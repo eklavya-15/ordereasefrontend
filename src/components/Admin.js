@@ -102,7 +102,7 @@ const Admin = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {orders.map((order) => (
+                  {orders.slice().reverse().map((order) => (
                     <tr key={order.id}>
                       <td className="text-xs px-3 py-1 text-left md:px-4 md:py-2 md:text-sm lg:px-4 lg:py-2 lg:text-base whitespace-nowrap">
                         #{order._id}

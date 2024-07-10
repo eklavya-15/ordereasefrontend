@@ -86,7 +86,7 @@ const Orders = () => {
                 </p>
               </div>
               <div className="space-y-2">
-                {order.items && order.items.map(item => (
+                {orders && orders.slice().reverse().map(item => (
                   <div key={item.dish.id} className="flex items-center space-x-4">
                     <img src={item.dish.image} alt={item.dish.name} className="w-16 h-16 object-cover rounded-lg" />
                     <div>
