@@ -72,7 +72,7 @@ const Menu = () => {
   return (
     <div>
       <Navbar />
-    <div className="categories bg-gray-100 min-h-screen py-8">
+      <div className="categories bg-gray-100 min-h-screen py-8">
       <div className="max-w-3xl mx-auto px-4">
         <h2 className="text-3xl font-bold mb-4 text-center text-black">Menu</h2>
 

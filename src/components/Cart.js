@@ -11,6 +11,7 @@ import {
   removeFromCart as removeFromCartAPI
 } from '../store/cartAPI';
 import { getUserById,updateUser } from "../store/userAPI";
+import { Button } from '@mui/material';
 
 const CartPage = () => {
   const userInfo = useSelector(selectUserInfo);
@@ -171,9 +172,9 @@ const CartPage = () => {
   return (
     <div>
       <Navbar />
-      <div className="w-screen min-h-screen bg-gray-100 mx-auto py-8">
-        <div className="flex justify-between items-start w-full">
-          <div className="w-1/2 ml-10">
+      <div className="w-screen min-h-screen bg-gray-100 mx-auto py-8 px-4 md:px-8 lg:px-16">
+      <div className="flex flex-col lg:flex-row justify-between items-start w-full">
+          <div className="w-full lg:w-1/2 lg:mb-0 lg:ml-10">
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Your Details</h2>
               <div className="flex items-center space-x-4 mb-4">
@@ -314,7 +315,7 @@ const CartPage = () => {
           </div>
 
           {cart.items.length ? (
-            <div className="w-1/3 mr-10">
+            <div className="w-full md:w-1/3 mr-10 md:mr-0 mt-6 md:mt-0">
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">Cart Summary</h2>
                 <div className="overflow-x-auto">
@@ -349,12 +350,13 @@ const CartPage = () => {
                     <p id="total" className="ml-4 text-xl font-semibold text-gray-800">₹{totalPrice()}</p>
                   </div>
                   {(selectedAddress !== '' || table !== 'Select Table Number') && <Link to="/checkout" onClick={handleCheckout} className="mr-4 bg-green-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300">Checkout</Link>}
+                  {!(selectedAddress !== '' || table !== 'Select Table Number') && <Button className="mr-4 bg-green-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300">Please Select Table No./Address</Button>}
                 </div>
               </div>
             </div>
           ) : (
-            <div className="w-1/3 flex justify-center items-center mr-12">
-              <div className="w-full flex flex-col justify-center items-center h-40vh bg-white rounded-lg shadow-md p-6">
+              <div className="w-full md:w-1/3 flex justify-center items-center mr-12 md:mr-0 mt-6 md:mt-0">
+                <div className="w-full flex flex-col justify-center items-center h-40vh bg-white rounded-lg shadow-md p-6">
                 <img
                   src="/carts.png"
                   alt="Empty Cart"

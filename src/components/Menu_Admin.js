@@ -130,7 +130,7 @@ const MenuAdmin = () => {
               <select
                 value={selectedCategory || ''}
                 onChange={handleCategoryChange}
-                className="border border-gray-300 px-4 py-2 rounded-lg text-center font-bold w-full md:w-auto"
+                className="border border-gray-300 px-4 py-2 rounded-lg text-center font-bold"
               >
                 <option value="">Select Category</option>
                 {categories.map(category => (
@@ -220,7 +220,7 @@ const MenuAdmin = () => {
                       name="categoryId"
                       value={newDish.categoryId}
                       onChange={handleAddDishChange}
-                      className="border border-gray-300 px-4 py-2 rounded-lg w-full"
+                      className="border border-gray-300 px-4 py-2 rounded-lg text-center font-bold"
                       required
                     >
                       <option value="">Select Category</option>

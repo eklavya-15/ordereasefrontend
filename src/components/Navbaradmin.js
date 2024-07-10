@@ -49,7 +49,7 @@ const NavbarAdmin = () => {
               More
             </button>
             <div
-              className={`absolute ${isOpen ? 'block' : 'hidden'} bg-white shadow-lg rounded mt-2 w-40`}
+              className={`absolute ${isOpen ? 'block' : 'hidden'} bg-white shadow-lg rounded mt-2 w-40 z-10`}
             >
               <Link
                 to="/admin"
@@ -94,6 +94,9 @@ const NavbarAdmin = () => {
           </Link>
           <Link to="/Reviews" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
             Customer Feedback
+          </Link>
+          <Link to="/" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                Log Out
           </Link>
           {/* <Link to="/settings_admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
             Settings
