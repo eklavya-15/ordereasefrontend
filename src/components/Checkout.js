@@ -61,6 +61,11 @@ const CheckoutPage = () => {
           tableNo: userInfo.tableNo,
           selectedAddress: userInfo.selectedAddress,
           orderStatus: ''
+        },
+        {
+          headers: {
+            Authorization: `Bearer sk_test_51PZr8IK18ZnTQfG6A7RZqEZSjLsG8YfN6PFHbm96TAZEhiOPE1iCqEuPxls1Ae1ahoKEuAgrhsPEDm8zKEf4NJgi00BeaKK1Ce`,
+          }
         }); 
   
         const clientSecret = paymentIntentResponse.data.clientSecret;
