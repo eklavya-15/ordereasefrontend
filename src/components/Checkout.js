@@ -63,11 +63,6 @@ const CheckoutPage = () => {
         tableNo: userInfo.tableNo,
         selectedAddress: userInfo.selectedAddress,
         orderStatus: ''
-      }, {
-        headers: {
-          Authorization: `Bearer ${process.env.REACT_APP_SECRET_KEY}`,
-          'Content-Type': 'application/json',
-        }
       });
   
       const clientSecret = paymentIntentResponse.data.clientSecret;
