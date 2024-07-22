@@ -66,7 +66,7 @@ const CheckoutPage = () => {
       });
   
       const clientSecret = paymentIntentResponse.data.clientSecret;
-  
+      console.log('Client secret:', clientSecret);
       const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement),
