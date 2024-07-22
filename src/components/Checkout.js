@@ -41,12 +41,11 @@ const CheckoutPage = () => {
 
   const handlePaymentSubmit = async (event) => {
     event.preventDefault();
-  
     if (!stripe || !elements) {
       console.error('Stripe or elements not loaded');
       return;
     }
-  
+
     try {
       setProcessing(true);
   
@@ -75,24 +74,24 @@ const CheckoutPage = () => {
           },
         },
       });
-  
+      
       if (error) {
         setPaymentError(error.message);
         console.error('Payment failed:', error);
         setProcessing(false);
-      } else if (paymentIntent.status === 'succeeded') {
-        await clearCartAPI(userId); // Ensure clearCartAPI works correctly
-        dispatch(setCart([]));
-        toast.success('Order Placed!');
-        navigate('/feedback');
       } else {
-        setPaymentError('Payment did not succeed. Please try again.');
-        console.error('Payment did not succeed:', paymentIntent);
-        setProcessing(false);
+        if (paymentIntent.status === 'succeeded') {
+          const cart = await clearCartAPI(userId);
+          // dispatch(clearCart());
+          dispatch(setCart([]));
+          console.log(cart);
+          toast.success('Order Placed!');
+          navigate("/feedback");
+        }
       }
     } catch (error) {
       setPaymentError('Payment failed. Please try again.');
-      console.error('Error:', error.response ? error.response.data : error.message);
+      console.error('Error:', error);
       setProcessing(false);
     }
   };
