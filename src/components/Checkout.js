@@ -39,66 +39,68 @@ const CheckoutPage = () => {
 
   
 
-    const handlePaymentSubmit = async (event) => {
-      event.preventDefault();
-      if (!stripe || !elements) {
+  const handlePaymentSubmit = async (event) => {
+    event.preventDefault();
   
-        return;
-      }
+    if (!stripe || !elements) {
+      console.error('Stripe or elements not loaded');
+      return;
+    }
   
-      try {
-        setProcessing(true);
-        const paymentIntentResponse = await axios.post('https://ordereasebackend.vercel.app/api/payment/create-payment-intent', {
-          amount: Math.round(total),
-          currency: 'usd', 
-          userId: userId,
-          userEmail: userInfo.email,
-          food: cart.items.map(item => item.dish.name).join(', '),
-          items: cart.items,
-          name: userInfo.name,
-          total: total,
-          orderType: userInfo.selectedOption,
-          tableNo: userInfo.tableNo,
-          selectedAddress: userInfo.selectedAddress,
-          orderStatus: ''
-        },
-        {
-          headers: {
-            Authorization: `Bearer sk_test_51PZr8IK18ZnTQfG6A7RZqEZSjLsG8YfN6PFHbm96TAZEhiOPE1iCqEuPxls1Ae1ahoKEuAgrhsPEDm8zKEf4NJgi00BeaKK1Ce`,
-          }
-        }); 
+    try {
+      setProcessing(true);
   
-        const clientSecret = paymentIntentResponse.data.clientSecret;
-  
-        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-          payment_method: {
-            card: elements.getElement(CardElement),
-            billing_details: {
-              name: userInfo.name, // Replace with actual userInfo name
-            },
-          },
-        });
-        
-        if (error) {
-          setPaymentError(error.message);
-          console.error('Payment failed:', error);
-          setProcessing(false);
-        } else {
-          if (paymentIntent.status === 'succeeded') {
-            const cart = await clearCartAPI(userId);
-            // dispatch(clearCart());
-            dispatch(setCart([]));
-            console.log(cart);
-            toast.success('Order Placed!');
-            navigate("/feedback");
-          }
+      const paymentIntentResponse = await axios.post('https://ordereasebackend.vercel.app/api/payment/create-payment-intent', {
+        amount: Math.round(total), // Ensure amount is in cents
+        currency: 'usd',
+        userId: userId,
+        userEmail: userInfo.email,
+        food: cart.items.map(item => item.dish.name).join(', '),
+        items: cart.items,
+        name: userInfo.name,
+        total: total,
+        orderType: userInfo.selectedOption,
+        tableNo: userInfo.tableNo,
+        selectedAddress: userInfo.selectedAddress,
+        orderStatus: ''
+      }, {
+        headers: {
+          Authorization: `Bearer ${process.env.REACT_APP_SECRET_KEY}`,
+          'Content-Type': 'application/json',
         }
-      } catch (error) {
-        setPaymentError('Payment failed. Please try again.');
-        console.error('Error:', error);
+      });
+  
+      const clientSecret = paymentIntentResponse.data.clientSecret;
+  
+      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: elements.getElement(CardElement),
+          billing_details: {
+            name: userInfo.name,
+          },
+        },
+      });
+  
+      if (error) {
+        setPaymentError(error.message);
+        console.error('Payment failed:', error);
+        setProcessing(false);
+      } else if (paymentIntent.status === 'succeeded') {
+        await clearCartAPI(userId); // Ensure clearCartAPI works correctly
+        dispatch(setCart([]));
+        toast.success('Order Placed!');
+        navigate('/feedback');
+      } else {
+        setPaymentError('Payment did not succeed. Please try again.');
+        console.error('Payment did not succeed:', paymentIntent);
         setProcessing(false);
       }
-    };
+    } catch (error) {
+      setPaymentError('Payment failed. Please try again.');
+      console.error('Error:', error.response ? error.response.data : error.message);
+      setProcessing(false);
+    }
+  };
   return (
     <div>
       <Navbar />
